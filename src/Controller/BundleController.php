@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Bundle;
-use App\Entity\Goods;
 use App\Forms\Bundle\BundleType;
 use App\Repository\BundleRepository;
-use App\Repository\GoodsRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -24,13 +22,11 @@ class BundleController extends AbstractController
 
         /** @var Bundle $goods */
         $bundle = $form->getData();
-        $entityManager = $managerRegistry->getManager();
 
-        /** @var BundleRepository $bundleRepository */
-        $bundleRepository = $entityManager->getRepository(Bundle::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->tryToSaveBundleAndShowNotification($form,$managerRegistry);
+            return $this->redirectToRoute('app_storage');
         }
 
 
@@ -56,14 +52,12 @@ class BundleController extends AbstractController
 
         if ($goodsRepository->findOneBy(['name' => $bundle->getName()])) {
             $this->addFlash('error', 'This bundle is already exists!');
-            $this->redirectToRoute('app_goods');
 
             return;
         }
         $entityManager->persist($bundle);
         $entityManager->flush();
         $this->addFlash('success', 'Bundle created properly');
-        $this->redirectToRoute('app_goods');
     }
 
     #[Route('/bundle/delete/{id}', name: 'app_bundle_delete')]

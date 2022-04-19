@@ -6,7 +6,6 @@ use App\Entity\Goods;
 use App\Forms\Goods\GoodsType;
 use App\Repository\GoodsRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +24,7 @@ class GoodsController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->tryToSaveGoodsAndShowNotification($form,$managerRegistry);
+            return $this->redirectToRoute('app_storage');
         }
 
         return $this->renderForm('goods/index.html.twig', [
@@ -44,14 +44,12 @@ class GoodsController extends AbstractController
 
         if ($goodsRepository->findOneBy(['name' => $goods->getName()])) {
             $this->addFlash('error', 'This goods is already exists!');
-            $this->redirectToRoute('app_goods');
 
             return;
         }
         $entityManager->persist($goods);
         $entityManager->flush();
         $this->addFlash('success', 'Goods created properly');
-        $this->redirectToRoute('app_goods');
     }
 
     #[Route('/goods/delete/{id}', name: 'app_goods_delete')]
