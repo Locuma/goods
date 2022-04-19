@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All enabled goods and bundles{% endblock %}
+
+{% block body %}
+    <h3>All goods:</h3>
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            id
+        </th>
+        <th>
+            name
+        </th>
+        <th>
+            price
+        </th>
+        <th>
+            action
+        </th>
+    </tr>
+    </thead>
+    {% for good in goods %}
+        <tr>
+            <td>{{ good.id }}</td>
+            <td>{{ good.name }}</td>
+            <td>{{ good.price }}</td>
+            <td><a href="{{ path('app_goods_delete', {'id': good.id}) }}">Delete</a></td>
+        </tr>
+    {% endfor %}
+</table>
+    <h3>All bundles:</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                id
+            </th>
+            <th>
+                name
+            </th>
+            <th>
+                included goods
+            </th>
+            <th>
+                price
+            </th>
+            <th>
+                action
+            </th>
+        </tr>
+        </thead>
+        {% for bundle in bundles %}
+            <tr>
+                <td>{{ bundle.id }}</td>
+                <td>{{ bundle.name }}</td>
+                <td>
+                    {% for good in bundle.getGoods() %}
+                        {{good.name}} - {{good.price}} <br>
+                    {% endfor %}
+                </td>
+                <td>{{ bundle.price }}</td>
+                <td><a href="{{ path('app_bundle_delete', {'id': bundle.id}) }}">Delete</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
