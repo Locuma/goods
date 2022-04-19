@@ -25,7 +25,7 @@ class BundleController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->tryToSaveBundleAndShowNotification($form,$managerRegistry);
+            $this->tryToSaveBundleAndSetNotification($form,$managerRegistry);
             return $this->redirectToRoute('app_storage');
         }
 
@@ -36,7 +36,7 @@ class BundleController extends AbstractController
         ]);
     }
 
-    private function tryToSaveBundleAndShowNotification(FormInterface $form, ManagerRegistry $managerRegistry): void
+    private function tryToSaveBundleAndSetNotification(FormInterface $form, ManagerRegistry $managerRegistry): void
     {
         /** @var Bundle $bundle */
         $bundle = $form->getData();
@@ -47,14 +47,7 @@ class BundleController extends AbstractController
 
         $bundle->setPrice($bundlePrice);
         $entityManager = $managerRegistry->getManager();
-        /** @var BundleRepository $goodsRepository */
-        $goodsRepository = $entityManager->getRepository(Bundle::class);
 
-        if ($goodsRepository->findOneBy(['name' => $bundle->getName()])) {
-            $this->addFlash('error', 'This bundle is already exists!');
-
-            return;
-        }
         $entityManager->persist($bundle);
         $entityManager->flush();
         $this->addFlash('success', 'Bundle created properly');

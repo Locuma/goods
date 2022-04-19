@@ -23,7 +23,7 @@ class GoodsController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->tryToSaveGoodsAndShowNotification($form,$managerRegistry);
+            $this->tryToSaveGoodsAndSetNotification($form,$managerRegistry);
             return $this->redirectToRoute('app_storage');
         }
 
@@ -33,20 +33,12 @@ class GoodsController extends AbstractController
         ]);
     }
 
-    private function tryToSaveGoodsAndShowNotification(FormInterface $form, ManagerRegistry $managerRegistry): void
+    private function tryToSaveGoodsAndSetNotification(FormInterface $form, ManagerRegistry $managerRegistry): void
     {
         /** @var Goods $goods */
         $goods = $form->getData();
         $entityManager = $managerRegistry->getManager();
 
-        /** @var GoodsRepository $goodsRepository */
-        $goodsRepository = $entityManager->getRepository(Goods::class);
-
-        if ($goodsRepository->findOneBy(['name' => $goods->getName()])) {
-            $this->addFlash('error', 'This goods is already exists!');
-
-            return;
-        }
         $entityManager->persist($goods);
         $entityManager->flush();
         $this->addFlash('success', 'Goods created properly');
